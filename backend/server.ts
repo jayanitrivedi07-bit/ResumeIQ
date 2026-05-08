@@ -4,8 +4,9 @@ import path from "path";
 import multer from "multer";
 import { fileURLToPath } from "url";
 import admin from "firebase-admin";
-import { analyzeResumeBackend } from "./backend/gemini.ts";
+import { analyzeResumeBackend } from "./gemini.ts";
 import dotenv from "dotenv";
+import { createRequire } from "module";
 
 dotenv.config();
 
