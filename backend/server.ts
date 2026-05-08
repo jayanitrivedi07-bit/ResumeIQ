@@ -8,6 +8,9 @@ import { analyzeResumeBackend } from "./gemini.ts";
 import dotenv from "dotenv";
 import { createRequire } from "module";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 dotenv.config({ path: path.join(__dirname, "../.env") });
 dotenv.config(); // Also try default for local dev flexibility
 
@@ -39,8 +42,6 @@ if (!admin.apps.length && serviceAccount) {
 export const adminAuth = admin.auth();
 export const adminDb = admin.firestore();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
