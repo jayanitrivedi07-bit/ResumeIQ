@@ -56,6 +56,7 @@ Your app needs its API keys to function. You must set these in the Cloud Run con
 5.  Add the following:
     *   `GEMINI_API_KEY`: Your key from Google AI Studio.
     *   `FIREBASE_SERVICE_ACCOUNT`: The **entire JSON content** of your service account file.
+    *   **Note:** You do **not** need to set `PORT`. Cloud Run will automatically provide it (usually 8080) and the app is now configured to listen to it.
 6.  Click **Deploy**.
 
 ---
