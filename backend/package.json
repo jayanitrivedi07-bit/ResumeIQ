@@ -3,7 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "NODE_ENV=production tsx server.ts",
-    "dev": "tsx server.ts"
+    "start": "NODE_ENV=production npx tsx server.ts",
+    "dev": "npx tsx server.ts"
+  },
+  "dependencies": {
+    "tsx": "^4.21.0"
   }
 }
