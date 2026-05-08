@@ -1,8 +1,12 @@
 node_modules
 dist
-.env*
-*.json
+.env
+# Keep JSON files except specific secrets
 !package.json
 !package-lock.json
-!firebase-applet-config.json
+!backend/package.json
+!frontend/package.json
+# Ignore the actual service account keys
+*adminsdk*.json
+*serviceAccountKey*.json
 .git

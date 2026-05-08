@@ -8,24 +8,29 @@ import { analyzeResumeBackend } from "./gemini.ts";
 import dotenv from "dotenv";
 import { createRequire } from "module";
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, "../.env") });
+dotenv.config(); // Also try default for local dev flexibility
 
 const require = createRequire(import.meta.url);
 const pdf = require("pdf-parse");
 
 // Load service account from ENV or file
 let serviceAccount;
-if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-} else {
-  // Look in parent dir since we moved to /backend
-  serviceAccount = require("../resumeiq-495613-firebase-adminsdk-fbsvc-52ac0bf3e5.json");
+try {
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  } else {
+    // Look in parent dir since we moved to /backend
+    serviceAccount = require("../resumeiq-495613-firebase-adminsdk-fbsvc-52ac0bf3e5.json");
+  }
+} catch (error) {
+  console.warn("⚠️ Firebase service account not found. History features will be disabled until FIREBASE_SERVICE_ACCOUNT env var is set.");
 }
 
 const PDFParse = pdf.PDFParse;
 
 // Initialize Firebase Admin SDK (only once)
-if (!admin.apps.length) {
+if (!admin.apps.length && serviceAccount) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
