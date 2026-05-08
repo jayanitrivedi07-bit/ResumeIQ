@@ -1,0 +1,6 @@
+{
+  "name": "ResumeIQ",
+  "description": "Professional AI-powered resume analysis, ATS optimization and job-matching tool using Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["AI Analysis", "PDF Processing", "User Accounts", "Job Matching"]
+}

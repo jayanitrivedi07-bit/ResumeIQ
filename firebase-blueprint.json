@@ -1,0 +1,40 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "ResumeVersion": {
+      "title": "Resume Version",
+      "description": "A specific version of a analyzed resume",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "fileName": { "type": "string" },
+        "resumeText": { "type": "string" },
+        "analysis": { "$ref": "#/entities/ResumeAnalysis" },
+        "targetJob": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "resumeText", "analysis", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "users/{userId}/resumes/{resumeId}": {
+      "schema": "ResumeVersion",
+      "description": "Versions of resumes for a user"
+    }
+  }
+}
