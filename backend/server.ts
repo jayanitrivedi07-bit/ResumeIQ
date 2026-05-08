@@ -1,18 +1,20 @@
-import express from "express";
-import { createServer as createViteServer } from "vite";
-import path from "path";
-import multer from "multer";
-import { fileURLToPath } from "url";
-import admin from "firebase-admin";
-import { analyzeResumeBackend } from "./gemini.ts";
 import dotenv from "dotenv";
-import { createRequire } from "module";
+import path from "path";
+import { fileURLToPath } from "url";
 
+// Initialize environment variables BEFORE any other imports (especially Gemini)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, "../.env") });
-dotenv.config(); // Also try default for local dev flexibility
+dotenv.config();
+
+import express from "express";
+import { createServer as createViteServer } from "vite";
+import multer from "multer";
+import admin from "firebase-admin";
+import { analyzeResumeBackend } from "./gemini.ts";
+import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
 const pdf = require("pdf-parse");
@@ -41,7 +43,6 @@ if (!admin.apps.length && serviceAccount) {
 
 export const adminAuth = admin.auth();
 export const adminDb = admin.firestore();
-
 
 async function startServer() {
   const app = express();

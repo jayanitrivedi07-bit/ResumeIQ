@@ -1,9 +1,15 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 
-dotenv.config();
+// Environment variables are loaded by server.ts
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+let aiInstance: GoogleGenAI | null = null;
+function getAI() {
+  if (!aiInstance) {
+    aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+  }
+  return aiInstance;
+}
 
 const resumeAnalysisSchema = {
   type: Type.OBJECT,
@@ -54,6 +60,7 @@ export async function analyzeResumeBackend(resumeText: string, jobDescription?: 
   }
 
   try {
+    const ai = getAI();
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash", // Use a stable model name
       contents: prompt,
