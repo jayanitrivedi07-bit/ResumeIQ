@@ -17,7 +17,8 @@ let serviceAccount;
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 } else {
-  serviceAccount = require("./resumeiq-495613-firebase-adminsdk-fbsvc-52ac0bf3e5.json");
+  // Look in parent dir since we moved to /backend
+  serviceAccount = require("../resumeiq-495613-firebase-adminsdk-fbsvc-52ac0bf3e5.json");
 }
 
 const PDFParse = pdf.PDFParse;
@@ -94,7 +95,7 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), "dist");
+    const distPath = path.join(__dirname, "../frontend/dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));

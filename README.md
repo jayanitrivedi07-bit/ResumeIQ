@@ -1,69 +1,85 @@
-# ElevateAI Resume Reviewer
+# 🚀 ResumeIQ.ai - AI-Powered Resume Optimizer
 
-A modern, AI-powered resume analysis tool built with React, Node.js, and Google's Gemini 3 Flash. ElevateAI helps job seekers optimize their resumes for ATS (Applicant Tracking Systems) and professional impact.
+ResumeIQ is a premium, state-of-the-art resume analysis tool that uses Gemini AI to help candidates optimize their resumes for modern hiring systems (ATS) and land their dream jobs with precision.
 
-## Features
+![ResumeIQ Landing Page](https://github.com/jayanitrivedi07-bit/ResumeIQ/raw/main/public/preview.png)
 
-- **PDF Text Extraction**: Secure server-side processing of PDF resumes.
-- **AI-Powered Insights**: Comprehensive review using Gemini AI.
-- **ATS Optimization**: Specific tips to pass through automated filters.
-- **Project Refinement**: AI-suggested rewrites for project and experience descriptions.
-- **Modern UI**: Dark-themed, responsive interface with glassmorphism and smooth animations.
+## ✨ Features
 
-## Tech Stack
+- **AI Analysis:** Detailed feedback on strengths, weaknesses, and ATS optimization.
+- **Project Refinement:** Gemini-powered "Before & After" suggestions for your experience descriptions.
+- **Targeted Insights:** Paste a specific job description to get tailored advice.
+- **Analysis History:** Save and track your improvement scores over time.
+- **Secure Architecture:** Backend-integrated AI calls for maximum API key security.
+- **Premium UI:** Sleek, modern dashboard with dark mode and glassmorphism aesthetics.
 
-- **Frontend**: React 19, Tailwind CSS 4, Motion, Recharts, Lucide React.
-- **Backend**: Node.js, Express, Multer, PDF-parse.
-- **AI**: Google Gemini API (@google/genai).
+## 🏗️ Project Structure
 
-## Getting Started
+The project is organized into separate modules for easy navigation and maintenance:
+
+```bash
+├── frontend/          # Vite + React (UI, Components, Contexts)
+├── backend/           # Node.js + Express (PDF Parsing, Gemini AI Integration)
+├── Dockerfile         # Container configuration for GCP deployment
+└── .env.example       # Template for required environment variables
+```
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React 19, Vite, Tailwind CSS, Lucide React, Framer Motion.
+- **Backend:** Node.js, Express, Multer, PDF-Parse.
+- **AI:** Google Gemini 1.5 Flash via Google Generative AI SDK.
+- **Database:** Firebase Firestore for history and authentication.
+- **Deployment:** Docker-ready, optimized for Google Cloud Run.
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js (v18+)
-- A Gemini API Key from [Google AI Studio](https://aistudio.google.com/)
+- Node.js 20+ 
+- A Google AI Studio API Key
+- A Firebase Project (Firestore + Auth enabled)
 
-### Installation
+### Local Setup
 
-1. Clone the repository.
-2. Install dependencies:
+1. **Clone the repo:**
+   ```bash
+   git clone https://github.com/jayanitrivedi07-bit/ResumeIQ.git
+   cd ResumeIQ
+   ```
+
+2. **Install Dependencies:**
    ```bash
    npm install
    ```
-3. Set up environment variables:
-   Create a `.env` file based on `.env.example`:
-   ```bash
-   GEMINI_API_KEY=your_actual_api_key
+
+3. **Configure Environment:**
+   Create a `.env` file in the root (or use the one in `frontend/`) and add:
+   ```env
+   GEMINI_API_KEY=your_key_here
+   FIREBASE_SERVICE_ACCOUNT=your_json_string_here
    ```
 
-### Running Locally
-
-To start the full-stack application in development mode:
-```bash
-npm run dev
-```
-The app will be available at `http://localhost:3000`.
-
-## Deployment
-
-This application is designed to be deployed as a full-stack containerized app.
-
-### Deployment Instructions (Cloud Run)
-
-1. Build the production assets:
+4. **Run Development Server:**
    ```bash
-   npm run build
+   npm run dev
    ```
-2. The server (`server.ts`) is configured to serve the static files from the `dist/` directory in production mode.
-3. Ensure the environment variable `GEMINI_API_KEY` is set in your deployment environment.
-4. The application listens on port 3000.
+   The app will be available at `http://localhost:3000`.
 
-## Environment Variables
+## ☁️ Deployment on GCP
 
-| Variable | Description |
-|----------|-------------|
-| `GEMINI_API_KEY` | Your Google AI Studio API key. |
-| `APP_URL` | (Optional) The base URL of the deployed application. |
+This project is optimized for **Google Cloud Run**:
 
----
-Built with ❤️ using Google AI Studio.
+1. **Build the image:**
+   ```bash
+   gcloud builds submit --tag gcr.io/[PROJECT_ID]/resumeiq
+   ```
+
+2. **Deploy:**
+   ```bash
+   gcloud run deploy resumeiq --image gcr.io/[PROJECT_ID]/resumeiq --platform managed
+   ```
+
+## 📄 License
+
+© 2026 ResumeIQ Technologies Inc. - All rights reserved.
