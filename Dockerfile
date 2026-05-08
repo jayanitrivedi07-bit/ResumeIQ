@@ -6,21 +6,20 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+COPY backend/package*.json ./backend/
 
-# Install dependencies
+# Install dependencies (including production dependencies for tsx)
 RUN npm install
 
 # Copy the rest of the application code
 COPY . .
 
 # Build the frontend
-WORKDIR /app/frontend
-RUN npm install
 RUN npm run build
 
-# Set up the backend
-WORKDIR /app/backend
-RUN npm install
+# Expose the port (Cloud Run uses PORT environment variable)
+EXPOSE 8080
 
-# Start the application
+# Start the application using the root start script
 CMD ["npm", "start"]
