@@ -62,7 +62,7 @@ export async function analyzeResumeBackend(resumeText: string, jobDescription?: 
   try {
     const ai = getAI();
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash", 
+      model: "gemini-2.0-flash", 
       contents: prompt,
       config: {
         systemInstruction: "You are an expert recruitment consultant and ATS optimization specialist. Provide honest, constructive, and highly professional advice.",
@@ -72,9 +72,9 @@ export async function analyzeResumeBackend(resumeText: string, jobDescription?: 
     });
 
     return JSON.parse(response.text || "{}");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini Analysis Error:", error);
-    throw new Error("Failed to analyze resume with AI.");
+    throw new Error(`Failed to analyze resume with AI: ${error.message}`);
   }
 }
 
@@ -104,7 +104,7 @@ export async function recreateResume(resumeText: string, jobDescription: string,
   try {
     const ai = getAI();
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-pro", 
+      model: "gemini-2.0-flash", 
       contents: prompt,
       config: {
         systemInstruction: "You are a world-class professional resume writer. Your output should be ready to be copied and pasted directly into a document editor.",
