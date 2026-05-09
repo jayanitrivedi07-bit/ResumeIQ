@@ -252,7 +252,7 @@ export default function App() {
           </div>
         </aside>
 
-        <section className={`flex-1 flex flex-col gap-6 overflow-hidden transition-all duration-700 delay-300 ${(!analysis && !isLoading && !showHistory) ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
+        <section className={`flex-1 flex flex-col gap-6 overflow-hidden transition-all duration-700 delay-300 ${(!analysis && !isLoading && !showHistory && !showTemplates) ? 'translate-y-10 opacity-0' : 'translate-y-0 opacity-100'}`}>
           {isLoading ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-500 bg-white/5 rounded-2xl border border-white/5 border-dashed">
               <div className="w-12 h-12 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
