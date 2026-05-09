@@ -1,6 +1,10 @@
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const pdf = require("pdf-parse");
 
 // Initialize environment variables BEFORE any other imports
 const __filename = fileURLToPath(import.meta.url);
@@ -15,10 +19,6 @@ import { createServer as createViteServer } from "vite";
 import multer from "multer";
 import admin from "firebase-admin";
 import { analyzeResumeBackend } from "./gemini.ts";
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
-const pdf = require("pdf-parse");
 
 // Load service account from ENV or file
 let serviceAccount: any = null;
@@ -78,21 +78,21 @@ async function startServer() {
   // API Route to parse PDF
   app.post("/api/parse-resume", upload.single("resume"), async (req, res) => {
     try {
-      if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
-      }
-
-      if (req.file.mimetype !== "application/pdf") {
-        return res.status(400).json({ error: "Only PDF files are supported" });
-      }
-
-      console.log("📄 Parsing PDF...");
-      // Standard pdf-parse usage
+      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+      console.log(`📄 Parsing PDF: ${req.file.originalname} (${req.file.size} bytes)`);
+      
       const data = await pdf(req.file.buffer);
+      
+      if (!data.text || data.text.trim().length === 0) {
+        console.warn("⚠️ PDF parsed but no text was extracted. Is it a scanned document?");
+        return res.status(422).json({ error: "The PDF appears to be empty or a scanned image. Please provide a text-based PDF." });
+      }
+
+      console.log("✅ PDF parsed successfully. Character count:", data.text.length);
       res.json({ text: data.text });
-    } catch (error) {
-      console.error("PDF Parsing Error:", error);
-      res.status(500).json({ error: "Failed to parse resume PDF" });
+    } catch (err: any) {
+      console.error("❌ PDF Parsing Error Details:", err);
+      res.status(500).json({ error: `Failed to parse resume PDF: ${err.message}` });
     }
   });
 

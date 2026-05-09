@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 interface TemplateSelectorProps {
   resumeText: string;
   jobDescription: string;
-  onRecreate: (text: string, templateName: string) => Promise<{ text: string }>;
+  onRecreate: (text: string, jobDescription: string, templateName: string) => Promise<{ text: string }>;
 }
 
 const templates = [
