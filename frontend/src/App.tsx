@@ -193,7 +193,7 @@ export default function App() {
       </header>
 
       <AnimatePresence>
-        {!analysis && !isLoading && !showHistory && (
+        {!analysis && !isLoading && !showHistory && !showTemplates && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -223,7 +223,7 @@ export default function App() {
       </AnimatePresence>
 
       <main className="flex-1 flex p-6 gap-6 relative z-10 overflow-hidden">
-        <aside className={`w-80 flex flex-col gap-6 transition-all duration-700 overflow-y-auto custom-scrollbar pr-2 h-full ${!analysis && !isLoading && !showHistory ? 'translate-x-[-120%] opacity-0' : 'translate-x-0 opacity-100'}`}>
+        <aside className={`w-80 flex flex-col gap-6 transition-all duration-700 overflow-y-auto custom-scrollbar pr-2 h-full ${(!analysis && !isLoading && !showHistory && !showTemplates) ? 'translate-x-[-120%] opacity-0' : 'translate-x-0 opacity-100'}`}>
           <div className="shrink-0 space-y-6">
             <FileUploader onFileSelect={handleFileSelect} isLoading={isLoading} compact />
             
