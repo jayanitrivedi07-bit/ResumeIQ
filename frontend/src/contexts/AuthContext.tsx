@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../lib/firebase";
+import { initFirebase } from "../lib/firebase";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 interface AuthContextType {
@@ -15,41 +15,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const init = async () => {
-      const { auth: initializedAuth, db: initializedDb } = await initFirebase();
-      
-      if (!initializedAuth) {
+    console.log("🔐 AuthContext: Initializing...");
+    
+    // Safety timeout: never stay in loading state more than 5 seconds
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        console.warn("🔐 AuthContext: Loading timed out after 5s. Forcing loading=false.");
         setLoading(false);
-        return;
       }
+    }, 5000);
 
-      const unsubscribe = onAuthStateChanged(initializedAuth, async (firebaseUser) => {
-        if (firebaseUser && initializedDb) {
-          try {
-            const userRef = doc(initializedDb, "users", firebaseUser.uid);
-            const userDoc = await getDoc(userRef);
-
-            if (!userDoc.exists()) {
-              await setDoc(userRef, {
-                uid: firebaseUser.uid,
-                email: firebaseUser.email,
-                displayName: firebaseUser.displayName,
-                createdAt: serverTimestamp(),
-              });
-            }
-          } catch (err) {
-            console.warn("Firestore user sync failed:", err);
-          }
+    const init = async () => {
+      try {
+        console.log("🔐 AuthContext: Calling initFirebase...");
+        const { auth: initializedAuth, db: initializedDb } = await initFirebase();
+        console.log("🔐 AuthContext: initFirebase completed. Auth exists:", !!initializedAuth);
+        
+        if (!initializedAuth) {
+          console.warn("🔐 AuthContext: No auth instance found. Ending loading.");
+          clearTimeout(timeoutId);
+          setLoading(false);
+          return;
         }
-        setUser(firebaseUser);
-        setLoading(false);
-      });
 
-      return unsubscribe;
+        console.log("🔐 AuthContext: Setting up onAuthStateChanged...");
+        const unsubscribe = onAuthStateChanged(initializedAuth, async (firebaseUser) => {
+          console.log("🔐 AuthContext: Auth state changed. User:", firebaseUser?.uid || "null");
+          
+          if (firebaseUser && initializedDb) {
+            try {
+              const userRef = doc(initializedDb, "users", firebaseUser.uid);
+              const userDoc = await getDoc(userRef);
+
+              if (!userDoc.exists()) {
+                await setDoc(userRef, {
+                  uid: firebaseUser.uid,
+                  email: firebaseUser.email,
+                  displayName: firebaseUser.displayName,
+                  createdAt: serverTimestamp(),
+                });
+              }
+            } catch (err) {
+              console.warn("🔐 AuthContext: Firestore sync failed:", err);
+            }
+          }
+          setUser(firebaseUser);
+          setLoading(false);
+          clearTimeout(timeoutId);
+        });
+
+        return unsubscribe;
+      } catch (error) {
+        console.error("🔐 AuthContext: Fatal error in init:", error);
+        setLoading(false);
+        clearTimeout(timeoutId);
+      }
     };
 
     const cleanupPromise = init();
     return () => {
+      clearTimeout(timeoutId);
       cleanupPromise.then(unsubscribe => {
         if (typeof unsubscribe === 'function') unsubscribe();
       });

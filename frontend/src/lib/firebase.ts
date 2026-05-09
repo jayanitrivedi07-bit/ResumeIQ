@@ -13,8 +13,11 @@ export async function initFirebase(): Promise<{ auth: Auth | null, db: Firestore
 
   try {
     // Try to get config from backend
+    console.log("🔥 initFirebase: Fetching config from /api/config...");
     const response = await fetch("/api/config");
+    console.log("🔥 initFirebase: Fetch response status:", response.status);
     const { firebase: config } = await response.json();
+    console.log("🔥 initFirebase: Received config. API Key present:", !!config?.apiKey);
 
     if (config && config.apiKey) {
       app = initializeApp(config);
@@ -22,7 +25,7 @@ export async function initFirebase(): Promise<{ auth: Auth | null, db: Firestore
       db = getFirestore(app);
       console.log("✅ Firebase initialized from remote config");
     } else {
-      console.warn("⚠️ Remote Firebase config missing. Using local env.");
+      console.warn("⚠️ Remote Firebase config missing or invalid. Falling back to local env.");
       const localConfig = {
         apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
         authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
