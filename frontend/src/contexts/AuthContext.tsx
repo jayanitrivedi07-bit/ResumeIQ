@@ -15,36 +15,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth) {
-      setLoading(false);
-      return;
-    }
-
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser && db) {
-        // Sync user to Firestore — wrapped in try/catch so auth always resolves
-        try {
-          const userRef = doc(db, "users", firebaseUser.uid);
-          const userDoc = await getDoc(userRef);
-
-          if (!userDoc.exists()) {
-            await setDoc(userRef, {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email,
-              displayName: firebaseUser.displayName,
-              createdAt: serverTimestamp(),
-            });
-          }
-        } catch (err) {
-          console.warn("Firestore user sync failed:", err);
-        }
+    const init = async () => {
+      const { auth: initializedAuth, db: initializedDb } = await initFirebase();
+      
+      if (!initializedAuth) {
+        setLoading(false);
+        return;
       }
-      // Always update auth state regardless of Firestore success/failure
-      setUser(firebaseUser);
-      setLoading(false);
-    });
 
-    return unsubscribe;
+      const unsubscribe = onAuthStateChanged(initializedAuth, async (firebaseUser) => {
+        if (firebaseUser && initializedDb) {
+          try {
+            const userRef = doc(initializedDb, "users", firebaseUser.uid);
+            const userDoc = await getDoc(userRef);
+
+            if (!userDoc.exists()) {
+              await setDoc(userRef, {
+                uid: firebaseUser.uid,
+                email: firebaseUser.email,
+                displayName: firebaseUser.displayName,
+                createdAt: serverTimestamp(),
+              });
+            }
+          } catch (err) {
+            console.warn("Firestore user sync failed:", err);
+          }
+        }
+        setUser(firebaseUser);
+        setLoading(false);
+      });
+
+      return unsubscribe;
+    };
+
+    const cleanupPromise = init();
+    return () => {
+      cleanupPromise.then(unsubscribe => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      });
+    };
   }, []);
 
   return (

@@ -148,6 +148,21 @@ async function startServer() {
 
     app.use(express.static(distPath));
     
+    // Config API to pass env vars to frontend
+    app.get("/api/config", (req, res) => {
+      res.json({
+        firebase: {
+          apiKey: process.env.VITE_FIREBASE_API_KEY,
+          authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+          projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+          storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+          messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+          appId: process.env.VITE_FIREBASE_APP_ID,
+          measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID
+        }
+      });
+    });
+
     // Debug API to check file existence
     app.get("/api/debug-files", (req, res) => {
       const fs = require("fs");

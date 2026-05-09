@@ -9,7 +9,7 @@ import {
   deleteDoc,
   serverTimestamp 
 } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { getDbInstance } from "../lib/firebase";
 import { ResumeVersion, ResumeAnalysis } from "../types";
 
 export function saveResumeVersion(
@@ -19,6 +19,7 @@ export function saveResumeVersion(
   analysis: ResumeAnalysis,
   targetJob?: string
 ) {
+  const db = getDbInstance();
   if (!db) return Promise.reject("Database not initialized");
   const resumesRef = collection(db, "users", userId, "resumes");
   return addDoc(resumesRef, {
@@ -32,6 +33,7 @@ export function saveResumeVersion(
 }
 
 export function subscribeToResumeVersions(userId: string, callback: (versions: ResumeVersion[]) => void) {
+  const db = getDbInstance();
   if (!db) {
     callback([]);
     return () => {};
@@ -49,6 +51,7 @@ export function subscribeToResumeVersions(userId: string, callback: (versions: R
 }
 
 export function deleteResumeVersion(userId: string, resumeId: string) {
+  const db = getDbInstance();
   if (!db) return Promise.reject("Database not initialized");
   const resumeRef = doc(db, "users", userId, "resumes", resumeId);
   return deleteDoc(resumeRef);
