@@ -15,7 +15,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import multer from "multer";
 import admin from "firebase-admin";
-import { analyzeResumeBackend } from "./gemini.ts";
+import { analyzeResumeBackend, recreateResume } from "./gemini.ts";
 
 // Load service account from ENV or file
 let serviceAccount: any = null;
@@ -105,6 +105,21 @@ async function startServer() {
     } catch (error: any) {
       console.error("Analysis Error:", error);
       res.status(500).json({ error: error.message || "Failed to analyze resume" });
+    }
+  });
+
+  app.post("/api/recreate-resume", async (req, res) => {
+    try {
+      const { resumeText, jobDescription, templateName } = req.body;
+      if (!resumeText || !jobDescription || !templateName) {
+        return res.status(400).json({ error: "Missing required fields (resumeText, jobDescription, templateName)" });
+      }
+      console.log(`✨ Recreating resume with template: ${templateName}...`);
+      const result = await recreateResume(resumeText, jobDescription, templateName);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Recreation Error:", error);
+      res.status(500).json({ error: error.message || "Failed to recreate resume" });
     }
   });
 
