@@ -19,6 +19,7 @@ export function saveResumeVersion(
   analysis: ResumeAnalysis,
   targetJob?: string
 ) {
+  if (!db) return Promise.reject("Database not initialized");
   const resumesRef = collection(db, "users", userId, "resumes");
   return addDoc(resumesRef, {
     userId,
@@ -31,6 +32,10 @@ export function saveResumeVersion(
 }
 
 export function subscribeToResumeVersions(userId: string, callback: (versions: ResumeVersion[]) => void) {
+  if (!db) {
+    callback([]);
+    return () => {};
+  }
   const resumesRef = collection(db, "users", userId, "resumes");
   const q = query(resumesRef);
 
@@ -44,6 +49,7 @@ export function subscribeToResumeVersions(userId: string, callback: (versions: R
 }
 
 export function deleteResumeVersion(userId: string, resumeId: string) {
+  if (!db) return Promise.reject("Database not initialized");
   const resumeRef = doc(db, "users", userId, "resumes", resumeId);
   return deleteDoc(resumeRef);
 }

@@ -2,10 +2,11 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Initialize environment variables BEFORE any other imports (especially Gemini)
+// Initialize environment variables BEFORE any other imports
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Try to load .env if it exists (mostly for local development)
 dotenv.config({ path: path.join(__dirname, "../.env") });
 dotenv.config();
 
@@ -20,33 +21,51 @@ const require = createRequire(import.meta.url);
 const pdf = require("pdf-parse");
 
 // Load service account from ENV or file
-let serviceAccount;
+let serviceAccount: any = null;
 try {
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    console.log("ℹ️ Loading Firebase service account from environment variable.");
     serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
   } else {
-    // Look in parent dir since we moved to /backend
-    serviceAccount = require("../resumeiq-495613-firebase-adminsdk-fbsvc-52ac0bf3e5.json");
+    const saPath = path.join(__dirname, "../resumeiq-495613-firebase-adminsdk-fbsvc-52ac0bf3e5.json");
+    console.log(`ℹ️ Looking for Firebase service account file at: ${saPath}`);
+    serviceAccount = require(saPath);
   }
 } catch (error) {
-  console.warn("⚠️ Firebase service account not found. History features will be disabled until FIREBASE_SERVICE_ACCOUNT env var is set.");
+  console.warn("⚠️ Firebase service account not found or invalid. History features will be disabled.");
 }
 
-const PDFParse = pdf.PDFParse;
-
-// Initialize Firebase Admin SDK (only once)
-if (!admin.apps.length && serviceAccount) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+// Initialize Firebase Admin SDK safely
+let isFirebaseInitialized = false;
+if (serviceAccount) {
+  try {
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+      isFirebaseInitialized = true;
+      console.log("✅ Firebase Admin SDK initialized successfully.");
+    }
+  } catch (error) {
+    console.error("❌ Failed to initialize Firebase Admin SDK:", error);
+  }
 }
 
-export const adminAuth = admin.auth();
-export const adminDb = admin.firestore();
+// Safe accessors for Firebase services
+export const getAdminAuth = () => {
+  if (!isFirebaseInitialized) return null;
+  return admin.auth();
+};
+
+export const getAdminDb = () => {
+  if (!isFirebaseInitialized) return null;
+  return admin.firestore();
+};
 
 async function startServer() {
+  console.log("🚀 Starting server initialization...");
   const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
+  const PORT = Number(process.env.PORT) || 8080; // Default to 8080 for Cloud Run
 
   // Configure Multer for file uploads
   const upload = multer({
@@ -67,9 +86,10 @@ async function startServer() {
         return res.status(400).json({ error: "Only PDF files are supported" });
       }
 
-      const parser = new PDFParse({ data: req.file.buffer });
-      const result = await parser.getText();
-      res.json({ text: result.text });
+      console.log("📄 Parsing PDF...");
+      // Standard pdf-parse usage
+      const data = await pdf(req.file.buffer);
+      res.json({ text: data.text });
     } catch (error) {
       console.error("PDF Parsing Error:", error);
       res.status(500).json({ error: "Failed to parse resume PDF" });
@@ -82,6 +102,7 @@ async function startServer() {
       if (!resumeText) {
         return res.status(400).json({ error: "Resume text is required" });
       }
+      console.log("🧠 Analyzing resume with Gemini...");
       const analysis = await analyzeResumeBackend(resumeText, jobDescription);
       res.json(analysis);
     } catch (error: any) {
@@ -92,11 +113,16 @@ async function startServer() {
 
   // Health check
   app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+    res.json({ 
+      status: "ok", 
+      firebase: isFirebaseInitialized ? "connected" : "disabled",
+      timestamp: new Date().toISOString()
+    });
   });
 
-  // Vite middleware for development
+  // Serve static files or Vite dev server
   if (process.env.NODE_ENV !== "production") {
+    console.log("🛠️ Running in development mode with Vite middleware");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -105,15 +131,56 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(__dirname, "../frontend/dist");
+    console.log(`📦 Serving static files from: ${distPath}`);
+    
+    // Debug: Check if dist exists
+    import("fs").then(fs => {
+      if (fs.existsSync(distPath)) {
+        console.log("✅ dist directory found");
+        console.log("📄 Files in dist:", fs.readdirSync(distPath));
+        if (fs.existsSync(path.join(distPath, "assets"))) {
+          console.log("📄 Files in dist/assets:", fs.readdirSync(path.join(distPath, "assets")));
+        }
+      } else {
+        console.error("❌ dist directory NOT found at:", distPath);
+      }
+    });
+
     app.use(express.static(distPath));
+    
+    // Debug API to check file existence
+    app.get("/api/debug-files", (req, res) => {
+      const fs = require("fs");
+      try {
+        const files = fs.readdirSync(distPath);
+        res.json({ distPath, files });
+      } catch (err: any) {
+        res.status(500).json({ error: err.message, distPath });
+      }
+    });
+
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running at http://0.0.0.0:${PORT}`);
+    console.log(`✅ Server is listening on port ${PORT}`);
+    console.log(`🔗 URL: http://0.0.0.0:${PORT}`);
   });
 }
 
-startServer();
+// Global error handler to catch unhandled rejections
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("❌ Uncaught Exception:", error);
+});
+
+startServer().catch(err => {
+  console.error("❌ Failed to start server:", err);
+  process.exit(1);
+});
+

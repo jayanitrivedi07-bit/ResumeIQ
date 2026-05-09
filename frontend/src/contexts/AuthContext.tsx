@@ -15,8 +15,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
+      if (firebaseUser && db) {
         // Sync user to Firestore — wrapped in try/catch so auth always resolves
         try {
           const userRef = doc(db, "users", firebaseUser.uid);
@@ -31,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
           }
         } catch (err) {
-          console.warn("Firestore user sync failed (check Firestore rules):", err);
+          console.warn("Firestore user sync failed:", err);
         }
       }
       // Always update auth state regardless of Firestore success/failure

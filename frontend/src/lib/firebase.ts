@@ -1,6 +1,7 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -11,10 +12,17 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Only initialize if we have an API key, otherwise the app will crash on a blank screen
+let app;
+if (firebaseConfig.apiKey && getApps().length === 0) {
+  app = initializeApp(firebaseConfig);
+} else if (getApps().length > 0) {
+  app = getApp();
+}
+
+export const auth = app ? getAuth(app) : null;
+export const db = app ? getFirestore(app) : null;
 export const googleProvider = new GoogleAuthProvider();
 
-export const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
-export const logout = () => auth.signOut();
+export const signInWithGoogle = () => auth ? signInWithPopup(auth, googleProvider) : Promise.reject("Firebase not initialized");
+export const logout = () => auth ? auth.signOut() : Promise.resolve();
