@@ -1,10 +1,7 @@
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
-const pdf = require("pdf-parse");
+import pdf from "pdf-parse-new";
 
 // Initialize environment variables BEFORE any other imports
 const __filename = fileURLToPath(import.meta.url);
