@@ -1,85 +1,55 @@
-# 🚀 ResumeIQ.ai - AI-Powered Resume Optimizer
+# ResumeIQ.ai 🚀
+### Intelligence for your career.
 
-ResumeIQ is a premium, state-of-the-art resume analysis tool that uses Gemini AI to help candidates optimize their resumes for modern hiring systems (ATS) and land their dream jobs with precision.
+Built with ❤️ by **Jayani Trivedi**
 
-![ResumeIQ Landing Page](https://github.com/jayanitrivedi07-bit/ResumeIQ/raw/main/public/preview.png)
+---
+
+## 🌟 Overview
+ResumeIQ is a next-generation, AI-powered career optimization platform. It doesn't just scan your resume—it dissects your experience through the lens of industry-leading recruitment standards to help you land your dream job with surgical precision.
+
+This project is a testament to the power of modern AI development, built entirely using the **Google AI Ecosystem**.
+
+## 🛠️ Built With
+- **AI Core:** [Google Gemini](https://ai.google.dev/) — Driving the deep semantic analysis and resume optimization.
+- **AI Orchestration:** [Google Antigravity](https://github.com/google/antigravity) — The powerful agentic framework used for development and system design.
+- **Deployment:** [Google Cloud Run](https://cloud.google.com/run) — Fully serverless, auto-scaling deployment.
+- **Conceptual Design:** [Google AI Studio](https://aistudio.google.com/) — Used for rapid prototyping of the model logic and initial app aesthetics.
+- **Infrastructure:** [Firebase](https://firebase.google.com/) — Secure authentication and real-time database.
+- **Frontend:** React + Vite + TailwindCSS 4.0.
 
 ## ✨ Features
-
-- **AI Analysis:** Detailed feedback on strengths, weaknesses, and ATS optimization.
-- **Project Refinement:** Gemini-powered "Before & After" suggestions for your experience descriptions.
-- **Targeted Insights:** Paste a specific job description to get tailored advice.
-- **Analysis History:** Save and track your improvement scores over time.
-- **Secure Architecture:** Backend-integrated AI calls for maximum API key security.
-- **Premium UI:** Sleek, modern dashboard with dark mode and glassmorphism aesthetics.
-
-## 🏗️ Project Structure
-
-The project is organized into separate modules for easy navigation and maintenance:
-
-```bash
-├── frontend/          # Vite + React (UI, Components, Contexts)
-├── backend/           # Node.js + Express (PDF Parsing, Gemini AI Integration)
-├── Dockerfile         # Container configuration for GCP deployment
-└── .env.example       # Template for required environment variables
-```
-
-## 🛠️ Tech Stack
-
-- **Frontend:** React 19, Vite, Tailwind CSS, Lucide React, Framer Motion.
-- **Backend:** Node.js, Express, Multer, PDF-Parse.
-- **AI:** Google Gemini 1.5 Flash via Google Generative AI SDK.
-- **Database:** Firebase Firestore for history and authentication.
-- **Deployment:** Docker-ready, optimized for Google Cloud Run.
+- **Deep Analysis:** Get a comprehensive "Score" and detailed feedback on your resume.
+- **ATS Optimization:** Specifically tuned to help you bypass modern Applicant Tracking Systems.
+- **Job Matching:** Input a job description to get a tailored "Gap Analysis."
+- **Smart History:** Track your progress over time with a saved archive of your resume versions.
+- **Dynamic Optimization (New):** Recreate your resume based on professional templates tailored for specific job roles.
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+- Node.js 20+
+- Google Cloud SDK (for deployment)
+- Firebase Project
 
-- Node.js 20+ 
-- A Google AI Studio API Key
-- A Firebase Project (Firestore + Auth enabled)
-
-### Local Setup
-
-1. **Clone the repo:**
-   ```bash
-   git clone https://github.com/jayanitrivedi07-bit/ResumeIQ.git
-   cd ResumeIQ
-   ```
-
-2. **Install Dependencies:**
+### Local Development
+1. Clone the repository
+2. Install dependencies:
    ```bash
    npm install
    ```
-
-3. **Configure Environment:**
-   Create a `.env` file in the root (or use the one in `frontend/`) and add:
-   ```env
-   GEMINI_API_KEY=your_key_here
-   FIREBASE_SERVICE_ACCOUNT=your_json_string_here
-   ```
-
-4. **Run Development Server:**
+3. Set up your `.env` file with your Gemini API Key and Firebase Config.
+4. Run the backend:
    ```bash
-   npm run dev
+   cd backend && npm run dev
    ```
-   The app will be available at `http://localhost:3000`.
-
-## ☁️ Deployment on GCP
-
-This project is optimized for **Google Cloud Run**:
-
-1. **Build the image:**
+5. Run the frontend:
    ```bash
-   gcloud builds submit --tag gcr.io/[PROJECT_ID]/resumeiq
+   cd frontend && npm run dev
    ```
 
-2. **Deploy:**
-   ```bash
-   gcloud run deploy resumeiq --image gcr.io/[PROJECT_ID]/resumeiq --platform managed
-   ```
+## 📜 License
+This project is for demonstration purposes. Developed by **Jayani Trivedi** using Google's state-of-the-art AI tools.
 
-## 📄 License
-
-© 2026 ResumeIQ Technologies Inc. - All rights reserved.
+---
+*Powered by Google Gemini 1.5 Pro.*

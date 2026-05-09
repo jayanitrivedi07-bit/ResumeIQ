@@ -19,3 +19,23 @@ export async function analyzeResume(resumeText: string, jobDescription?: string)
     throw new Error(error.message || "Failed to analyze resume with AI.");
   }
 }
+
+export async function recreateResume(resumeText: string, jobDescription: string, templateName: string): Promise<{ text: string }> {
+  try {
+    const response = await fetch("/api/recreate-resume", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resumeText, jobDescription, templateName }),
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || "Recreation failed");
+    }
+
+    return await response.json();
+  } catch (error: any) {
+    console.error("Recreation Error:", error);
+    throw new Error(error.message || "Failed to recreate resume with AI.");
+  }
+}

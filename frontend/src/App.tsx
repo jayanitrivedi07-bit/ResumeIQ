@@ -12,6 +12,8 @@ import {
   subscribeToResumeVersions, 
   deleteResumeVersion 
 } from "./services/resumeStore";
+import { recreateResume } from "./services/geminiService";
+import { TemplateSelector } from "./components/TemplateSelector";
 import { ResumeAnalysis, ResumeVersion } from "./types";
 import { Sparkles, LayoutDashboard, History, FileStack, LogOut, Loader2, AlertCircle, RefreshCcw, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -25,6 +27,7 @@ export default function App() {
   const [parsedText, setParsedText] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [history, setHistory] = useState<ResumeVersion[]>([]);
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
 
@@ -152,18 +155,23 @@ export default function App() {
         <div className="flex items-center gap-4">
           <nav className="hidden md:flex gap-6 text-sm font-medium text-slate-400 mr-4">
             <button 
-              onClick={() => { setAnalysis(null); setShowHistory(false); }} 
-              className={`${!analysis && !showHistory ? 'text-white' : 'hover:text-white'} flex items-center gap-2 transition-colors`}
+              onClick={() => { setAnalysis(null); setShowHistory(false); setShowTemplates(false); }} 
+              className={`${!analysis && !showHistory && !showTemplates ? 'text-white' : 'hover:text-white'} flex items-center gap-2 transition-colors`}
             >
               <LayoutDashboard className="w-4 h-4" /> Dashboard
             </button>
             <button 
-              onClick={() => setShowHistory(true)} 
+              onClick={() => { setShowHistory(true); setShowTemplates(false); }} 
               className={`${showHistory ? 'text-white' : 'hover:text-white'} flex items-center gap-2 transition-colors`}
             >
               <History className="w-4 h-4" /> History
             </button>
-            <a href="#" className="hover:text-white flex items-center gap-2 transition-colors"><FileStack className="w-4 h-4" /> Templates</a>
+            <button 
+              onClick={() => { setShowTemplates(true); setShowHistory(false); }} 
+              className={`${showTemplates ? 'text-white' : 'hover:text-white'} flex items-center gap-2 transition-colors`}
+            >
+              <FileStack className="w-4 h-4" /> Templates
+            </button>
           </nav>
           <div className="flex items-center gap-3 pl-6 border-l border-white/10">
             <div className="text-right hidden sm:block">
@@ -292,6 +300,14 @@ export default function App() {
                 <h3 className="text-lg font-bold text-white mb-2">History Mode</h3>
                 <p className="text-sm text-slate-500 max-w-xs">Select a previous analysis from the sidebar on the left to view the details.</p>
               </div>
+            </div>
+          ) : showTemplates ? (
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+              <TemplateSelector 
+                resumeText={parsedText || ""} 
+                jobDescription={jobDescription} 
+                onRecreate={recreateResume} 
+              />
             </div>
           ) : (
             <div className="flex-1 border-2 border-dashed border-white/5 rounded-2xl flex items-center justify-center">

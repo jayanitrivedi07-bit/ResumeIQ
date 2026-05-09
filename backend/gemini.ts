@@ -62,7 +62,7 @@ export async function analyzeResumeBackend(resumeText: string, jobDescription?: 
   try {
     const ai = getAI();
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash", // Use a stable model name
+      model: "gemini-1.5-flash", 
       contents: prompt,
       config: {
         systemInstruction: "You are an expert recruitment consultant and ATS optimization specialist. Provide honest, constructive, and highly professional advice.",
@@ -75,5 +75,45 @@ export async function analyzeResumeBackend(resumeText: string, jobDescription?: 
   } catch (error) {
     console.error("Gemini Analysis Error:", error);
     throw new Error("Failed to analyze resume with AI.");
+  }
+}
+
+export async function recreateResume(resumeText: string, jobDescription: string, templateName: string) {
+  const prompt = `You are a professional resume writer. Recreate the following resume to perfectly match the provided job description.
+  
+  USE THE FOLLOWING STYLE/TEMPLATE: ${templateName}
+  
+  GUIDELINES:
+  - If template is 'Modern', use a clean, impact-focused style with clear headers.
+  - If template is 'Creative', use more descriptive, engaging language while staying professional.
+  - If template is 'Academic', focus on research, publications, and technical depth.
+  - If template is 'Minimal', use extremely concise bullet points and focus only on core achievements.
+  
+  ORIGINAL RESUME:
+  ${resumeText}
+  
+  TARGET JOB DESCRIPTION:
+  ${jobDescription}
+  
+  INSTRUCTIONS:
+  - Rewrite the experience sections to use 'action-verbs' and 'quantifiable achievements'.
+  - Naturally integrate keywords from the job description.
+  - Return the FULL optimized resume text.
+  - DO NOT include any conversational text, just the resume itself.`;
+
+  try {
+    const ai = getAI();
+    const response = await ai.models.generateContent({
+      model: "gemini-1.5-pro", 
+      contents: prompt,
+      config: {
+        systemInstruction: "You are a world-class professional resume writer. Your output should be ready to be copied and pasted directly into a document editor.",
+      },
+    });
+
+    return { text: response.text };
+  } catch (error) {
+    console.error("Gemini Recreation Error:", error);
+    throw new Error("Failed to recreate resume with AI.");
   }
 }
