@@ -161,13 +161,13 @@ export default function App() {
               <LayoutDashboard className="w-4 h-4" /> Dashboard
             </button>
             <button 
-              onClick={() => { setShowHistory(true); setShowTemplates(false); }} 
+              onClick={() => { setShowHistory(true); setShowTemplates(false); setAnalysis(null); }} 
               className={`${showHistory ? 'text-white' : 'hover:text-white'} flex items-center gap-2 transition-colors`}
             >
               <History className="w-4 h-4" /> History
             </button>
             <button 
-              onClick={() => { setShowTemplates(true); setShowHistory(false); }} 
+              onClick={() => { setShowTemplates(true); setShowHistory(false); setAnalysis(null); }} 
               className={`${showTemplates ? 'text-white' : 'hover:text-white'} flex items-center gap-2 transition-colors`}
             >
               <FileStack className="w-4 h-4" /> Templates
