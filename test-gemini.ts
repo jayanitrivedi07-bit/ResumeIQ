@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "backend/.env" }); // Assuming backend has .env, or use root
 dotenv.config(); // fallback to current dir
 
-const aiInstance = new GoogleGenAI({ apiKey: "AIzaSyD5so9UMuMvypOpm_jLe1W2dMAV5x6UsJs" });
+const aiInstance = new GoogleGenAI({ apiKey: "YOUR_ACTUAL_API_KEY_HERE" });
 
 const resumeAnalysisSchema = {
   type: Type.OBJECT,
